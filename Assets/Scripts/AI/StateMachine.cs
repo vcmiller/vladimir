@@ -7,7 +7,7 @@ public class StateMachine : MonoBehaviour {
     public State current { get; private set; }
     
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         states = new List<State>();
 	}
 
