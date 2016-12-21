@@ -13,11 +13,11 @@ public class Cannonball : Ability {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetButtonDown(button) && !player.targetting && useTimer.canUse) {
+		if (Input.GetButtonDown(button) && !player.targetting && useTimer.canUse && !active) {
             player.targetting = true;
         }
 
-        if (Input.GetButtonUp(button) && player.targetting) {
+        if (Input.GetButtonUp(button) && player.targetting && !active) {
             player.targetting = false;
             if (useTimer.Use) {
                 Activate();
