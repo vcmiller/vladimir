@@ -16,6 +16,7 @@ public class Player : MonoBehaviour {
     public float health { get; protected set; }
     public bool targetting { get; set; }
     public bool slowTime { get; set; }
+    public bool canKick { get; private set; }
     
     public float runThreshold = 0.05f;
     public float moveSpeed = 0.5f;
@@ -23,6 +24,9 @@ public class Player : MonoBehaviour {
     public float jumpThreshold = 0.2f;
     public Vector2 cameraRange;
     public float maxHealth = 100;
+    public float wallJumpRange = .5f;
+    public Vector2 wallJumpSpeed;
+    public float hmove = 0;
 
     public const bool LEFT = false;
     public const bool RIGHT = true;
@@ -80,27 +84,35 @@ public class Player : MonoBehaviour {
     protected virtual void UpdateGrounded() {
         RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.1f, Vector2.down, 0.51f);
         grounded = hit.collider;
+
+        if (grounded) {
+            canKick = true;
+        }
     }
 
     protected virtual void Attacks() {
         bool attack = false;
-        if (Input.GetButtonDown("AttackLeft") && !attacking) {
-            side = LEFT;
-            attack = true;
-        } else if (Input.GetButtonDown("AttackRight") && !attacking) {
-            side = RIGHT;
-            attack = true;
+        if (grounded || canKick) {
+            if (Input.GetButtonDown("AttackLeft") && !attacking) {
+                side = LEFT;
+                attack = true;
+
+                canKick = false;
+            } else if (Input.GetButtonDown("AttackRight") && !attacking) {
+                side = RIGHT;
+                attack = true;
+
+                canKick = false;
+            }
         }
 
         if (attack) {
             attacking = true;
             if (grounded) {
-                Invoke("StopAttack", 0.25f);
             } else {
                 rigidbody.velocity = side == RIGHT ? Vector2.right * 20 : Vector2.left * 20;
-                Invoke("StopAttack", 0.3f);
             }
-
+            Invoke("StopAttack", 0.25f);
         }
 
         if (attacking) {
@@ -117,6 +129,18 @@ public class Player : MonoBehaviour {
                 if (enemy) {
                     enemy.Die(side);
                 }
+            }
+        }
+        
+    }
+
+    void OnCollision2D(Collider2D other) {
+        Enemy enemy = other.GetComponent<Enemy>();
+        if (enemy) {
+            if (side == (enemy.transform.position.x > transform.position.x) && attacking) {
+                enemy.Die(side);
+            } else if (rigidbody.velocity.y < 0) {
+                enemy.Die(side);
             }
         }
     }
@@ -136,8 +160,10 @@ public class Player : MonoBehaviour {
 
     protected virtual void Movement() {
         float f = Input.GetAxis("Horizontal");
+        
+        hmove = f;
 
-        transform.Translate(Vector3.right * f * moveSpeed * Time.fixedDeltaTime);
+        transform.Translate(Vector3.right * hmove * moveSpeed * Time.fixedDeltaTime);
 
         if (!attacking) {
             if (f < -runThreshold) {
@@ -150,8 +176,12 @@ public class Player : MonoBehaviour {
 
         running = Mathf.Abs(f) > runThreshold;
 
-        if (grounded && (Input.GetButtonDown("Jump") || (Input.GetAxis("Vertical") > jumpThreshold && !jumpHeld))) {
-            rigidbody.velocity = Vector2.up * jumpSpeed;
+        if (Input.GetButtonDown("Jump") || (Input.GetAxis("Vertical") > jumpThreshold && !jumpHeld)) {
+            if (grounded) {
+                rigidbody.velocity = Vector2.up * jumpSpeed;
+            } else {
+               // TryWallJump();
+            }
         }
 
         if (Input.GetAxis("Vertical") < jumpThreshold) {
@@ -159,6 +189,28 @@ public class Player : MonoBehaviour {
         } else {
             jumpHeld = true;
         }
+    }
+
+    void TryWallJump() {
+        RaycastHit2D left = Physics2D.Raycast(transform.position, Vector3.left, wallJumpRange);
+        RaycastHit2D right = Physics2D.Raycast(transform.position, Vector3.right, wallJumpRange);
+
+        if (left.collider && right.collider) {
+            if (left.distance < right.distance) {
+                WallJump(LEFT);
+            } else {
+                WallJump(RIGHT);
+            }
+        } else if (left.collider) {
+            WallJump(LEFT);
+        } else if (right.collider) {
+            WallJump(RIGHT);
+        }
+    }
+
+    void WallJump(bool side) {
+        print("WalJJUMP");
+        rigidbody.velocity = (side ? Vector2.left : Vector2.right) * wallJumpSpeed.x + Vector2.up * wallJumpSpeed.y;
     }
 
     protected virtual void Animations() {

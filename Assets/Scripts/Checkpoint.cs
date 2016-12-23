@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour {
     public Animator animator { get; private set; }
+    public SpriteRenderer sprite { get; private set; }
     public int index;
+    public int layer;
 
 	// Use this for initialization
 	void Start () {
+        sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 	}
 
@@ -24,8 +27,14 @@ public class Checkpoint : MonoBehaviour {
         }
     }
 
+    void Update() {
+        sprite.enabled = Controller.inst.activeLayers[layer];
+    }
+
     void OnTriggerEnter2D(Collider2D other) {
-        if (other.GetComponent<Player>()) {
+        Player p = other.GetComponent<Player>();
+        if (p) {
+
             foreach (Checkpoint point in FindObjectsOfType<Checkpoint>()) {
                 point.Close();
             }

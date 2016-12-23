@@ -23,7 +23,7 @@ public class State {
     public State getTransition() {
         foreach (Transition t in transitions) {
             if (t.CanEnter()) {
-                return t.end;
+                return t.Enter();
             }
         }
 

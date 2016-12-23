@@ -10,6 +10,7 @@ public class Ability : MonoBehaviour {
 
     public virtual void Awake() {
         useTimer = new CooldownTimer(cooldown);
+        useTimer.Clear();
         player = GetComponent<Player>();
     }
 	

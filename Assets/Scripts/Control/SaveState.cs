@@ -6,4 +6,12 @@ using UnityEngine;
 public class SaveState {
     public int checkpoint;
     public string file;
+    public bool[] keys;
+    public int upgradePoints;
+    public bool[] foundUpgrades;
+
+    public SaveState() {
+        keys = new bool[8];
+        foundUpgrades = new bool[8];
+    }
 }

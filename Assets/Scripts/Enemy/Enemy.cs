@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour {
 
         State patrol = new State(Patrol);
         State attack = new State(Attack);
-        Transition patrolToAttack = new Transition(patrol, attack, PlayerInView);
+        Transition patrolToAttack = new Transition(patrol, attack, PlayerInView, ResetShootTimer);
         Transition attackToPatrol = new Transition(attack, patrol, PlayerLost);
 
         machine.AddState(patrol);
@@ -42,6 +42,10 @@ public class Enemy : MonoBehaviour {
 
     public void Die(bool side) {
         GetComponent<DeathAnimation>().Play(side);
+    }
+
+    void ResetShootTimer() {
+        gun.shootTimer.Reset();
     }
 
     bool PlayerInView() {

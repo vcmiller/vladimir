@@ -17,6 +17,16 @@ public class ExpirationTimer {
         }
     }
 
+    public float remainingRatio {
+        get {
+            if (Expired) {
+                return 0;
+            } else {
+                return 1 - ((Time.time - LastSet) / Expiration);
+            }
+        }
+    }
+
 	public ExpirationTimer (float expiration) {
 		Expiration = expiration;
 		Clear ();

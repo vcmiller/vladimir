@@ -10,6 +10,8 @@ public class Cannonball : Ability {
 
     public Vector2 aim { get; private set; }
     public bool active { get; private set; }
+
+    
 	
 	// Update is called once per frame
 	void Update () {
@@ -28,7 +30,7 @@ public class Cannonball : Ability {
             Vector3 v = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
             if (v.magnitude > 0.8f) {
                 aim = v;
-                player.reticle.transform.localPosition = aim.normalized * reticleDist;
+                player.reticle.transform.localPosition = (Vector3)aim.normalized * reticleDist + Vector3.back * 2;
                 player.side = aim.x > 0;
             }
         }

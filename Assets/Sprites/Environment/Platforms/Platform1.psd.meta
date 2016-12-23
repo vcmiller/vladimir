@@ -1,12 +1,13 @@
 fileFormatVersion: 2
 guid: 8cf37b05a287b594c86e45ba1234901c
-timeCreated: 1482029701
+timeCreated: 1482452759
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Platform1_0
     21300002: Platform1_1
     21300004: Platform1_2
+    21300006: Platform1_3
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -119,6 +120,19 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
+        y: 0
+        width: 64
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Platform1_3
+      rect:
+        serializedVersion: 2
+        x: 192
         y: 0
         width: 64
         height: 32

@@ -24,7 +24,7 @@ public class ExplodeDeath : DeathAnimation {
     }
 
     void Explode() {
-        GameObject obj = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        GameObject obj = Instantiate(explosionPrefab, transform.position + Vector3.back * 2, Quaternion.identity);
         Material m = obj.GetComponent<MeshRenderer>().material;
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {

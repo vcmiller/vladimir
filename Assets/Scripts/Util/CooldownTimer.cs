@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 
 public class CooldownTimer {
@@ -16,6 +17,16 @@ public class CooldownTimer {
 		}
 	}
 
+    public float chargeRatio {
+        get {
+            if (Time.time - LastUse > Cooldown) {
+                return 1.0f;
+            } else {
+                return (Time.time - LastUse) / Cooldown;
+            }
+        }
+    }
+
     public bool canUse {
         get {
             return Time.time - LastUse > Cooldown;
@@ -30,5 +41,9 @@ public class CooldownTimer {
 	public void Clear() {
 		LastUse = Time.time - Cooldown;
 	}
+
+    public void Reset() {
+        LastUse = Time.time;
+    }
 }
 
