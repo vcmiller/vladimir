@@ -31,10 +31,10 @@ public class PlayerUI : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (FindPlayer()) {
-            healthbar.fillAmount = player.health / player.maxHealth;
+            healthbar.fillAmount = player.health / player.actualMaxHealth;
 
-            if (!slowTime.expiration.Expired) {
-                meterTime.fillAmount = slowTime.expiration.remainingRatio;
+            if (slowTime.slowed) {
+                meterTime.fillAmount = slowTime.remainingRatio;
             } else {
                 meterTime.fillAmount = slowTime.useTimer.chargeRatio;
             }

@@ -8,7 +8,7 @@ public class HealthPack : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D col) {
         Player player = col.GetComponent<Player>();
-        if (player && player.health < player.maxHealth) {
+        if (player && player.health < player.actualMaxHealth) {
             player.Damage(-healing);
             gameObject.SetActive(false);
             Invoke("ReEnable", regenTime);

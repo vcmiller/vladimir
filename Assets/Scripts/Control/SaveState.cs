@@ -7,11 +7,31 @@ public class SaveState {
     public int checkpoint;
     public string file;
     public bool[] keys;
-    public int upgradePoints;
-    public bool[] foundUpgrades;
+    public bool[] foundUpgradePoints;
+    public bool[] upgrades;
 
-    public SaveState() {
-        keys = new bool[8];
-        foundUpgrades = new bool[8];
+    public int getPurchasedUpgrades() {
+        int num = 0;
+        foreach (bool b in upgrades) {
+            if (b) {
+                num++;
+            }
+        }
+
+        return num;
+    }
+    
+    public int getUpgradePoints() {
+        int num = 0;
+        foreach (bool b in foundUpgradePoints) {
+            if (b) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public int getAvailablePoints() {
+        return getUpgradePoints() - getPurchasedUpgrades();
     }
 }

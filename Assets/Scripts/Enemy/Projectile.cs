@@ -6,6 +6,8 @@ public class Projectile : MonoBehaviour {
     public float speed;
     public float damage = 10;
 
+    public bool reflected { get; set; }
+
     public Rigidbody2D rigidbody { get; private set; }
 
     void Start() {
@@ -15,13 +17,19 @@ public class Projectile : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col) {
         Player p = col.collider.GetComponent<Player>();
+        Enemy e = col.collider.GetComponent<Enemy>();
         if (p) {
             p.Damage(damage);
+            Destroy(gameObject);
+        } else if (reflected && e) {
+            e.Die(transform.position.x < e.transform.position.x);
             Destroy(gameObject);
         } else {
             rigidbody.gravityScale = 2;
             Destroy(gameObject, 0.5f);
         }
+
+
 
     }
 }

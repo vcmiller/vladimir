@@ -8,10 +8,18 @@ public class Ability : MonoBehaviour {
     public Player player { get; private set; }
     public string button;
 
+    public UpgradableValue<float> actualCooldown;
+
     public virtual void Awake() {
         useTimer = new CooldownTimer(cooldown);
         useTimer.Clear();
         player = GetComponent<Player>();
+
+        actualCooldown = new UpgradableValue<float>(cooldown, cooldown * 0.7f, Upgrade.generalCooldowns);
+    }
+
+    public virtual void Update() {
+        useTimer.Cooldown = actualCooldown;
     }
 	
 }

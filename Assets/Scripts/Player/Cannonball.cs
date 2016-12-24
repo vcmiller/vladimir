@@ -4,17 +4,25 @@ using UnityEngine;
 
 public class Cannonball : Ability {
     public float duration;
+    public float durationUp;
     public float speed;
     public float reticleDist;
     public Sprite sprite;
 
+    public UpgradableValue<float> actualDuration;
+
     public Vector2 aim { get; private set; }
     public bool active { get; private set; }
 
-    
+    public override void Awake() {
+        base.Awake();
+        aim = new Vector2(1, 0);
+        actualDuration = new UpgradableValue<float>(duration, durationUp, Upgrade.cannonballDuration);
+    }
 	
 	// Update is called once per frame
-	void Update () {
+	public override void Update () {
+        base.Update();
 		if (Input.GetButtonDown(button) && !player.targetting && useTimer.canUse && !active) {
             player.targetting = true;
         }
@@ -41,7 +49,7 @@ public class Cannonball : Ability {
 	}
 
     void Activate() {
-        Invoke("Deactivate", duration);
+        Invoke("Deactivate", actualDuration);
 
         player.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         player.rigidbody.gravityScale = 0;
@@ -63,6 +71,9 @@ public class Cannonball : Ability {
             Enemy enemy = other.collider.GetComponent<Enemy>();
             if (enemy) {
                 enemy.Die(transform.position.x < enemy.transform.position.x);
+            } else if (Input.GetButton(button) && Controller.inst.currentSave.upgrades[Upgrade.cannonballBounce]) {
+                player.rigidbody.velocity = other.contacts[0].normal * speed;
+                print(player.rigidbody.velocity);
             }
         }
         

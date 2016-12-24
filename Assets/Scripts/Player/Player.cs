@@ -16,14 +16,17 @@ public class Player : MonoBehaviour {
     public float health { get; protected set; }
     public bool targetting { get; set; }
     public bool slowTime { get; set; }
-    public bool canKick { get; private set; }
+    public bool canKick { get; protected set; }
     
     public float runThreshold = 0.05f;
-    public float moveSpeed = 0.5f;
-    public float jumpSpeed = 2;
+    public float moveSpeed = 5;
+    public float moveSpeedUp = 7;
+    public float jumpSpeed = 10;
+    public float jumpSpeedUp = 13;
     public float jumpThreshold = 0.2f;
     public Vector2 cameraRange;
     public float maxHealth = 100;
+    public float maxHealthUp = 130;
     public float wallJumpRange = .5f;
     public Vector2 wallJumpSpeed;
     public float hmove = 0;
@@ -31,20 +34,26 @@ public class Player : MonoBehaviour {
     public const bool LEFT = false;
     public const bool RIGHT = true;
 
-    
-	protected virtual void Awake() {
+    public UpgradableValue<float> actualMaxHealth;
+    public UpgradableValue<float> actualMoveSpeed;
+    public UpgradableValue<float> actualJumpSpeed;
+
+    protected virtual void Awake() {
         animator = GetComponentInChildren<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         camera = GetComponentInChildren<Camera>();
         reticle = transform.FindChild("Reticle").GetComponent<SpriteRenderer>();
         health = maxHealth;
+
+        actualMaxHealth = new UpgradableValue<float>(maxHealth, maxHealthUp, Upgrade.generalHealth);
+        actualMoveSpeed = new UpgradableValue<float>(moveSpeed, moveSpeedUp, Upgrade.generalMove);
+        actualJumpSpeed = new UpgradableValue<float>(jumpSpeed, jumpSpeedUp, Upgrade.generalJump);
 	}
 
     public virtual void Damage(float damage) {
         health -= damage;
-        health = Mathf.Clamp(health, 0, maxHealth);
-
+        ClampHealth();
         if (health == 0) {
             GetComponent<DeathAnimation>().Play(side);
         }
@@ -55,6 +64,10 @@ public class Player : MonoBehaviour {
             GUI.color = new Color(0, 1, 0, 0.1f);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
         }
+    }
+
+    protected virtual void ClampHealth() {
+        health = Mathf.Clamp(health, 0, actualMaxHealth);
     }
 
     // Update is called once per frame
@@ -69,10 +82,24 @@ public class Player : MonoBehaviour {
 
         reticle.enabled = targetting;
         rigidbody.bodyType = targetting ? RigidbodyType2D.Static : RigidbodyType2D.Dynamic;
+
+        float targetTime = 1.0f;
+
+        if (targetting) {
+            targetTime = 0.1f;
+        } else if (slowTime) {
+            if (Controller.inst.currentSave.upgrades[Upgrade.timeEffect]) {
+                targetTime = 0.1f;
+            } else {
+                targetTime = 0.15f;
+            }
+        }
         
-        Time.timeScale = Mathf.MoveTowards(Time.timeScale, targetting || slowTime ? 0.1f : 1.0f, Time.unscaledDeltaTime * 4);
+        Time.timeScale = Mathf.MoveTowards(Time.timeScale, targetTime, Time.unscaledDeltaTime * 4);
 
         Time.fixedDeltaTime = 0.02F * Time.timeScale;
+
+        ClampHealth();
     }
 
     protected virtual void FixedUpdate() {
@@ -152,7 +179,6 @@ public class Player : MonoBehaviour {
 
     protected virtual void StopAttack() {
         attacking = false;
-
         Vector2 v = rigidbody.velocity;
         v.x = 0;
         rigidbody.velocity = v;
@@ -160,10 +186,13 @@ public class Player : MonoBehaviour {
 
     protected virtual void Movement() {
         float f = Input.GetAxis("Horizontal");
-        
-        hmove = f;
 
-        transform.Translate(Vector3.right * hmove * moveSpeed * Time.fixedDeltaTime);
+        hmove = f * actualMoveSpeed;
+        if (Controller.inst.currentSave.upgrades[Upgrade.timeMove] && slowTime) {
+            hmove *= 2f;
+        }
+
+        transform.Translate(Vector3.right * hmove * Time.fixedDeltaTime);
 
         if (!attacking) {
             if (f < -runThreshold) {
@@ -176,9 +205,9 @@ public class Player : MonoBehaviour {
 
         running = Mathf.Abs(f) > runThreshold;
 
-        if (Input.GetButtonDown("Jump") || (Input.GetAxis("Vertical") > jumpThreshold && !jumpHeld)) {
+        if (Input.GetAxis("Vertical") > jumpThreshold && !jumpHeld) {
             if (grounded) {
-                rigidbody.velocity = Vector2.up * jumpSpeed;
+                rigidbody.velocity = Vector2.up * actualJumpSpeed;
             } else {
                // TryWallJump();
             }

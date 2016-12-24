@@ -32,17 +32,13 @@ public class Controller : MonoBehaviour {
             fs.Close();
 
             UpdateProgress();
-            if (currentSave.keys == null) {
-                currentSave.keys = new bool[8];
-            }
-
-            if (currentSave.foundUpgrades == null) {
-                currentSave.foundUpgrades = new bool[FindObjectsOfType<UpgradePack>().Length];
-            }
         } else {
             currentSave = new SaveState();
             currentSave.checkpoint = -1;
             currentSave.file = saveName;
+            currentSave.upgrades = new bool[16];
+            currentSave.keys = new bool[8];
+            currentSave.foundUpgradePoints = new bool[16];
         }
     }
 
@@ -55,10 +51,13 @@ public class Controller : MonoBehaviour {
                 }
             }
         }
+
+        player.Damage(-player.actualMaxHealth);
     }
 
     public void Save() {
         BinaryFormatter bf = new BinaryFormatter();
+
         FileStream fs = File.Create(Application.persistentDataPath + "/" + currentSave.file);
         bf.Serialize(fs, currentSave);
         fs.Close();

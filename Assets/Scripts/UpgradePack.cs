@@ -16,8 +16,7 @@ public class UpgradePack : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (Application.isPlaying) {
-            if (Controller.inst.currentSave.foundUpgrades != null && Controller.inst.currentSave.foundUpgrades[index]) {
-                print("HI");
+            if (Controller.inst.currentSave.foundUpgradePoints != null && Controller.inst.currentSave.foundUpgradePoints[index]) {
                 gameObject.SetActive(false);
             }
         }
@@ -26,7 +25,7 @@ public class UpgradePack : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other) {
         if (other.GetComponent<Player>()) {
-            Controller.inst.currentSave.foundUpgrades[index] = true;
+            Controller.inst.currentSave.foundUpgradePoints[index] = true;
             Controller.inst.Save();
         }
     }
