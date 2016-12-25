@@ -5,16 +5,16 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UpgradePack : MonoBehaviour {
     public int index = -1;
-
-	// Use this for initialization
-	void Start () {
-		if (!Application.isPlaying && index < 0) {
-            index = FindObjectsOfType<UpgradePack>().Length - 1;
-        }
-	}
+    public bool set = false;
+    
 	
 	// Update is called once per frame
 	void Update () {
+        if (!Application.isPlaying && set) {
+            index = FindObjectsOfType<UpgradePack>().Length - 1;
+            set = false;
+        }
+
         if (Application.isPlaying) {
             if (Controller.inst.currentSave.foundUpgradePoints != null && Controller.inst.currentSave.foundUpgradePoints[index]) {
                 gameObject.SetActive(false);

@@ -70,6 +70,34 @@ public class PlayerClone : Player {
     protected override void Movement() {
         running = true;
         transform.Translate((side == RIGHT ? Vector2.right : Vector2.left) * moveSpeed * Time.fixedDeltaTime);
+
+        if (Controller.inst.currentSave.upgrades[Upgrade.fissionTurn] && Wall()) {
+            side = !side;
+        } else if (grounded && Controller.inst.currentSave.upgrades[Upgrade.fissionJump] && Gap()) {
+            rigidbody.velocity = Vector2.up * jumpSpeed;
+        }
+    }
+
+    bool Wall() {
+        RaycastHit2D hit;
+        if (side == RIGHT) {
+            hit = Physics2D.CapsuleCast(transform.position, new Vector2(0.5f, 1.0f), CapsuleDirection2D.Vertical, 0, Vector3.right, 0.5f, int.MaxValue);
+        } else {
+            hit = Physics2D.CapsuleCast(transform.position, new Vector2(0.5f, 1.0f), CapsuleDirection2D.Vertical, 0, Vector3.left, 0.5f, int.MaxValue);
+        }
+
+        return hit.collider;
+    }
+
+    bool Gap() {
+        RaycastHit2D hit;
+        if (side == RIGHT) {
+            hit = Physics2D.CapsuleCast(transform.position + Vector3.right * 0.5f, new Vector2(0.5f, 1.0f), CapsuleDirection2D.Vertical, 0, Vector3.down, 1.0f, int.MaxValue);
+        } else {
+            hit = Physics2D.CapsuleCast(transform.position + Vector3.left * 0.5f, new Vector2(0.5f, 1.0f), CapsuleDirection2D.Vertical, 0, Vector3.down, 1.0f, int.MaxValue);
+        }
+
+        return !hit.collider;
     }
 
     void Die() {

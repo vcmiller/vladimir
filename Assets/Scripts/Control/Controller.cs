@@ -7,7 +7,7 @@ using System.IO;
 public class Controller : MonoBehaviour {
     public static Controller inst { get; private set; }
 
-    public string saveName = "save.vtcr";
+    public static string saveName = "save.vtcr";
     public float layerPadding = 0.1f;
 
     public SaveState currentSave { get; private set; }

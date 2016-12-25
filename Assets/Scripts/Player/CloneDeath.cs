@@ -8,13 +8,9 @@ public class CloneDeath : DeathAnimation {
     public RuntimeAnimatorController deathAnimation;
 
     public override void Play(bool side) {
-        Destroy(GetComponent<Player>());
+        Destroy(GetComponent<PlayerClone>());
         GetComponentInChildren<Animator>().runtimeAnimatorController = deathAnimation;
         Destroy(GetComponent<Rigidbody2D>());
-
-        foreach (Ability abil in GetComponentsInChildren<Ability>()) {
-            Destroy(abil);
-        }
 
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = 0.02F * Time.timeScale;
@@ -23,10 +19,18 @@ public class CloneDeath : DeathAnimation {
     }
 
     void Explode() {
-        GameObject obj = Instantiate(explosionPrefab, transform.position + Vector3.back * 2, Quaternion.identity);
-        Material m = obj.GetComponent<MeshRenderer>().material;
+        if (Controller.inst.currentSave.upgrades[Upgrade.fissionExplode]) {
 
-        Destroy(obj, 0.5f);
-        m.SetFloat("_StartTime", Time.timeSinceLevelLoad);
+            GameObject obj = Instantiate(explosionPrefab, transform.position + Vector3.back * 2, Quaternion.identity);
+            Material m = obj.GetComponent<MeshRenderer>().material;
+            m.SetFloat("_StartTime", Time.timeSinceLevelLoad);
+            Destroy(obj, 1);
+
+            foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+                if (Vector3.SqrMagnitude(transform.position - enemy.transform.position) < 9) {
+                    enemy.Die(transform.position.x < enemy.transform.position.x);
+                }
+            }
+        }
     }
 }

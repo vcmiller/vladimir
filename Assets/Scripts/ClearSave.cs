@@ -11,7 +11,7 @@ public class ClearSave : MonoBehaviour {
 	void Update () {
 		if (clear) {
             clear = false;
-            File.Delete(Application.persistentDataPath + "/" + FindObjectOfType<Controller>().saveName);
+            File.Delete(Application.persistentDataPath + "/" + Controller.saveName);
         }
 	}
 }

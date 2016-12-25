@@ -10,6 +10,9 @@ public class UpgradeView : MonoBehaviour {
     public Image icon;
     public int index;
     public int requirement;
+    public string description;
+
+    public Text descriptionText;
 
     public Button button { get; private set; }
 
@@ -28,6 +31,10 @@ public class UpgradeView : MonoBehaviour {
         views[index] = this;
 
         button = GetComponent<Button>();
+    }
+
+    public void Select() {
+        descriptionText.text = description;
     }
 
     void Update() {

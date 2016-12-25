@@ -30,8 +30,8 @@ public class Enemy : MonoBehaviour {
 
         State patrol = new State(Patrol);
         State attack = new State(Attack);
-        Transition patrolToAttack = new Transition(patrol, attack, PlayerInView, ResetShootTimer);
-        Transition attackToPatrol = new Transition(attack, patrol, PlayerLost);
+        Transition patrolToAttack = new Transition(patrol, attack, TargetInView, ResetShootTimer);
+        Transition attackToPatrol = new Transition(attack, patrol, TargetLost);
 
         machine.AddState(patrol);
         machine.AddState(attack);
@@ -48,26 +48,34 @@ public class Enemy : MonoBehaviour {
         gun.shootTimer.Reset();
     }
 
-    bool PlayerInView() {
+    bool TargetInView() {
         if (FindTarget()) {
+            return InView(target);
+        } else {
+            return false;
+        }
+    }
+
+    bool InView(Transform t) {
+        if (t) {
             Vector3 forward;
-            
+
             if (side == RIGHT) {
                 forward = Vector3.right;
             } else {
                 forward = Vector3.left;
             }
 
-            Vector3 toPlayer = target.position - transform.position;
+            Vector3 toPlayer = t.position - transform.position;
             Vector3 toPlayerDir = toPlayer.normalized;
-            
+
             if (Vector3.Dot(forward, toPlayerDir) > viewDot) {
 
                 float mag = toPlayer.magnitude;
 
                 if (mag < viewDist) {
                     RaycastHit2D hit = Physics2D.Raycast(transform.position, toPlayer);
-                    if (hit.collider && hit.collider.GetComponent<Player>()) {
+                    if (hit.collider && hit.transform.root == t.root) {
                         return true;
                     }
                 }
@@ -77,8 +85,8 @@ public class Enemy : MonoBehaviour {
         return false;
     }
 
-    bool PlayerLost() {
-        if (PlayerInView()) {
+    bool TargetLost() {
+        if (TargetInView()) {
             enemySeenTimer.Set();
         }
 
@@ -117,8 +125,18 @@ public class Enemy : MonoBehaviour {
     }
 
     bool FindTarget() {
-        if (!target) {
-            target = FindObjectOfType<Player>().transform;
+
+        if (!target || Controller.inst.currentSave.upgrades[Upgrade.fissionDecoy]) {
+            if (Controller.inst.currentSave.upgrades[Upgrade.fissionDecoy]) {
+                PlayerClone decoy = FindObjectOfType<PlayerClone>();
+                if (decoy && InView(decoy.transform)) {
+                    target = decoy.transform;
+                }
+            }
+            
+            if (!target) {
+                target = FindObjectOfType<Player>().transform;
+            }
         }
 
         return target;

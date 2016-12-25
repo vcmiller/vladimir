@@ -19,8 +19,13 @@ public class Projectile : MonoBehaviour {
         Player p = col.collider.GetComponent<Player>();
         Enemy e = col.collider.GetComponent<Enemy>();
         if (p) {
-            p.Damage(damage);
-            Destroy(gameObject);
+            Cannonball c = p.GetComponent<Cannonball>();
+            if (c && c.active && Controller.inst.currentSave.upgrades[Upgrade.cannonballShield]) {
+                Destroy(gameObject);
+            } else {
+                p.Damage(damage);
+                Destroy(gameObject);
+            }
         } else if (reflected && e) {
             e.Die(transform.position.x < e.transform.position.x);
             Destroy(gameObject);

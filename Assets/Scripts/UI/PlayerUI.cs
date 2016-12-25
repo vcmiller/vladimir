@@ -13,6 +13,7 @@ public class PlayerUI : MonoBehaviour {
     public Image meterTime;
     public Image meterCannon;
     public Image meterFission;
+    public Image upgradeNote;
 
     bool FindPlayer() {
         if (!player) {
@@ -41,6 +42,8 @@ public class PlayerUI : MonoBehaviour {
 
             meterCannon.fillAmount = cannonball.useTimer.chargeRatio;
             meterFission.fillAmount = fission.useTimer.chargeRatio;
+
+            upgradeNote.enabled = Controller.inst.currentSave.getAvailablePoints() > 0;
         }
 	}
 }

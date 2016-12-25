@@ -64,8 +64,8 @@ Shader "Custom/BigBoom"
 			
 			fixed4 frag(v2f i) : SV_Target
 			{
-				int radius = _Res * ((_Time.y - _StartTime) / _Period);
-
+				float radius = (float)_Res * ((_Time.y - _StartTime) / _Period);
+				//return float4(radius, 0, 0, 1);
 
 				int x = i.uv.x * _Res;
 				int y = i.uv.y * _Res;

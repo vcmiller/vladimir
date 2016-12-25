@@ -8,6 +8,8 @@ public class Cannonball : Ability {
     public float speed;
     public float reticleDist;
     public Sprite sprite;
+    public GameObject explosionPrefab;
+    public SpriteRenderer shield;
 
     public UpgradableValue<float> actualDuration;
 
@@ -44,7 +46,17 @@ public class Cannonball : Ability {
         }
 
         if (active) {
-            player.rigidbody.velocity = aim.normalized * speed;
+            if (Controller.inst.currentSave.upgrades[Upgrade.cannonballBounce]) {
+                player.rigidbody.velocity = player.rigidbody.velocity.normalized * speed;
+            } else {
+                player.rigidbody.velocity = aim.normalized * speed;
+            }
+        }
+
+        if (Controller.inst.currentSave.upgrades[Upgrade.cannonballShield]) {
+            shield.enabled = active;
+        } else {
+            shield.enabled = false;
         }
 	}
 
@@ -53,6 +65,7 @@ public class Cannonball : Ability {
 
         player.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         player.rigidbody.gravityScale = 0;
+        player.rigidbody.velocity = aim.normalized * speed;
         active = true;
 
         player.animator.enabled = false;
@@ -64,6 +77,20 @@ public class Cannonball : Ability {
         player.rigidbody.gravityScale = 2;
         active = false;
         player.animator.enabled = true;
+
+        if (Controller.inst.currentSave.upgrades[Upgrade.cannonballExplode]) {
+
+            GameObject obj = Instantiate(explosionPrefab, transform.position + Vector3.back * 2, Quaternion.identity);
+            Material m = obj.GetComponent<MeshRenderer>().material;
+            m.SetFloat("_StartTime", Time.timeSinceLevelLoad);
+            Destroy(obj, 1);
+
+            foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+                if (Vector3.SqrMagnitude(transform.position - enemy.transform.position) < 9) {
+                    enemy.Die(transform.position.x < enemy.transform.position.x);
+                }
+            }
+        }
     }
 
     void OnCollisionEnter2D(Collision2D other) {
@@ -72,8 +99,7 @@ public class Cannonball : Ability {
             if (enemy) {
                 enemy.Die(transform.position.x < enemy.transform.position.x);
             } else if (Input.GetButton(button) && Controller.inst.currentSave.upgrades[Upgrade.cannonballBounce]) {
-                player.rigidbody.velocity = other.contacts[0].normal * speed;
-                print(player.rigidbody.velocity);
+                player.rigidbody.velocity = Vector2.Reflect(other.relativeVelocity, other.contacts[0].normal).normalized * speed;
             }
         }
         
