@@ -87,7 +87,7 @@ public class Cannonball : Ability {
 
             foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
                 if (Vector3.SqrMagnitude(transform.position - enemy.transform.position) < 9) {
-                    enemy.Die(transform.position.x < enemy.transform.position.x);
+                    enemy.Invoke("Die", Vector3.Distance(transform.position, enemy.transform.position) * 0.2f);
                 }
             }
         }

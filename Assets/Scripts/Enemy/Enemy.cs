@@ -40,6 +40,10 @@ public class Enemy : MonoBehaviour {
         machine.AddTransition(attackToPatrol);
 	}
 
+    public void Die() {
+        Die(Random.value > 0.5f);
+    }
+
     public void Die(bool side) {
         GetComponent<DeathAnimation>().Play(side);
     }

@@ -7,8 +7,6 @@ public class Weapon : MonoBehaviour {
     public GameObject projectile;
     public Vector3 fireOffset;
 
-    public Material aimMaterial;
-
     public float aim { get; set; }
     public CooldownTimer shootTimer { get; private set; }
     public bool firing { get; set; }
