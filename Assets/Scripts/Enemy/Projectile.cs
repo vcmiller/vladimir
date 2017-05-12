@@ -30,6 +30,7 @@ public class Projectile : MonoBehaviour {
             e.Die(transform.position.x < e.transform.position.x);
             Destroy(gameObject);
         } else {
+            print(col.collider.name);
             rigidbody.gravityScale = 2;
             Destroy(gameObject, 0.5f);
         }

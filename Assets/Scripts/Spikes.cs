@@ -9,5 +9,6 @@ public class Spikes : MonoBehaviour {
         if (player) {
             player.Damage(player.health);
         }
+
     }
 }

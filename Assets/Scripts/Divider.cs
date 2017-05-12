@@ -10,7 +10,7 @@ public class Divider : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        sprite = GetComponent<SpriteRenderer>();
+        sprite = transform.FindChild("Gradient").GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
@@ -21,10 +21,10 @@ public class Divider : MonoBehaviour {
             sprite.enabled = false;
         } else if (top) {
             sprite.enabled = true;
-            transform.localScale = new Vector3(1, 1, 1);
+            sprite.transform.localScale = new Vector3(1, 1, 1);
         } else if (bottom) {
             sprite.enabled = true;
-            transform.localScale = new Vector3(1, -1, 1);
+            sprite.transform.localScale = new Vector3(1, -1, 1);
         }
 	}
 }
